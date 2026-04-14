@@ -67,8 +67,7 @@ class CartScreen extends ConsumerWidget {
                     const SizedBox(height: 15),
 
                     // 2. Frequently Added Services (Horizontal)
-                    _buildFrequentlyAddedList(allServices, ref),
-
+                _buildFrequentlyAddedList(context, allServices, ref),
                     const SizedBox(height: 25),
 
                     // 3. Coupon Code Section
@@ -92,7 +91,7 @@ class CartScreen extends ConsumerWidget {
           ],
         ),
       ),
-     bottomSheet: _buildStickyBottom(context, ref, totalAmount),
+      bottomSheet: _buildStickyBottom(context, ref, totalAmount),
     );
   }
 
@@ -100,13 +99,16 @@ class CartScreen extends ConsumerWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.05,
+        vertical: 16,
+      ),
       child: Row(
         children: [
           GestureDetector(
-          onTap: () {
-  context.go(AppRoutes.home);
-},
+            onTap: () {
+              context.go(AppRoutes.home);
+            },
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -142,49 +144,47 @@ class CartScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
-          Text(
-            "$index. ",
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
+          Text("$index. "),
+
           Expanded(
             child: Text(
               item.title,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          // Stepper
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F1F1),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              children: [
-                _stepperBtn(
-                  Icons.remove,
-                  () => ref.read(cartProvider.notifier).removeItem(item.id),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(
-                    "$qty",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+
+          Flexible(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F1F1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _stepperBtn(
+                    Icons.remove,
+                    () => ref.read(cartProvider.notifier).removeItem(item.id),
                   ),
-                ),
-                _stepperBtn(
-                  Icons.add,
-                  () => ref.read(cartProvider.notifier).addItem(item.id),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text("$qty"),
+                  ),
+                  _stepperBtn(
+                    Icons.add,
+                    () => ref.read(cartProvider.notifier).addItem(item.id),
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(width: 15),
-          Text(
-            "₹${(item.price * qty).toInt()}",
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black54,
+
+          Flexible(
+            child: Text(
+              "₹${(item.price * qty).toInt()}",
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -206,17 +206,24 @@ class CartScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFrequentlyAddedList(List<ServiceItem> services, WidgetRef ref) {
+Widget _buildFrequentlyAddedList(
+  BuildContext context,
+  List<ServiceItem> services,
+  WidgetRef ref,
+){
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SizedBox(
-      height: 180,
+      height: screenWidth * 0.45,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: services.length,
         itemBuilder: (context, index) {
           final item = services[index];
+
           return Container(
-            width: 130,
-            margin: const EdgeInsets.only(right: 15),
+            width: screenWidth * 0.32,
+            margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
@@ -234,37 +241,41 @@ class CartScreen extends ConsumerWidget {
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(15),
                   ),
-                  child: Image.network(
+                  child: Image.asset(
+                    // ✅ asset fix
                     item.imageUrl,
-                    height: 100,
-                    width: 130,
+                    height: screenWidth * 0.25,
+                    width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) =>
-                        Container(color: Colors.grey[200]),
                   ),
                 ),
+
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8),
                   child: Text(
                     item.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "₹${item.price.toInt()}",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: Text(
+                          "₹${item.price.toInt()}",
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       GestureDetector(
@@ -273,7 +284,7 @@ class CartScreen extends ConsumerWidget {
                         child: const Icon(
                           Icons.add_circle,
                           color: Color(0xFF2EAD6F),
-                          size: 24,
+                          size: 22,
                         ),
                       ),
                     ],
