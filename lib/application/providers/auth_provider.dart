@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../infrastructure/services/auth_service.dart';
 
@@ -6,6 +7,8 @@ import '../../infrastructure/services/auth_service.dart';
 // Low-level service provider
 // ──────────────────────────────────────────────
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+
+final mockAuthProvider = StateProvider<bool>((ref) => false);
 
 // ──────────────────────────────────────────────
 // Stream of Supabase auth state changes

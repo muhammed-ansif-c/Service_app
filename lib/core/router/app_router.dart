@@ -40,8 +40,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
     // ── Redirect guard ────────────────────────────────────────────────────
     redirect: (BuildContext context, GoRouterState state) {
-      final session = Supabase.instance.client.auth.currentSession;
-      final isLoggedIn = session != null;
+     final session = Supabase.instance.client.auth.currentSession;
+final isSupabaseLoggedIn = session != null;
+
+final isMockLoggedIn = ref.watch(mockAuthProvider);
+
+final isLoggedIn = isSupabaseLoggedIn || isMockLoggedIn;
       final isPublicRoute = _publicRoutes.contains(state.matchedLocation);
 
       // Not logged in → send to login (unless already on a public route)

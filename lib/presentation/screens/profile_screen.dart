@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:service_app/application/providers/auth_provider.dart';
+import 'package:service_app/core/router/app_routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
- @override
-Widget build(BuildContext context, WidgetRef ref) {
-  final user = Supabase.instance.client.auth.currentUser;
-  final email = user?.email ?? "User";
-  final name = email.split('@')[0];
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = Supabase.instance.client.auth.currentUser;
+    final email = user?.email ?? "User";
+    final name = email.split('@')[0];
 
-  return Scaffold(
-
-
+    return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -23,51 +22,48 @@ Widget build(BuildContext context, WidgetRef ref) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 10),
 
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      context.go('/home'); // 🔥 back to home
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.chevron_left, size: 24),
+                    ),
+                  ),
 
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        'My Account',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ),
 
-            const SizedBox(height: 10),
+                  const SizedBox(width: 40), // balance spacing
+                ],
+              ),
 
-Row(
-  children: [
-    GestureDetector(
-      onTap: () {
-        context.go('/home'); // 🔥 back to home
-      },
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 5,
-            ),
-          ],
-        ),
-        child: const Icon(Icons.chevron_left, size: 24),
-      ),
-    ),
-
-    const Expanded(
-      child: Center(
-        child: Text(
-          'My Account',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-      ),
-    ),
-
-    const SizedBox(width: 40), // balance spacing
-  ],
-),
-
-const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
               // --- Profile Section ---
               Row(
@@ -96,22 +92,19 @@ const SizedBox(height: 30),
                   const SizedBox(width: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children:  [
-                     Text(
-  name,
-  style: const TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-    color: Color(0xFF424242),
-  ),
-),
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF424242),
+                        ),
+                      ),
                       SizedBox(height: 4),
                       Text(
                         email,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -121,7 +114,10 @@ const SizedBox(height: 30),
 
               // --- Wallet Card ---
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE0FBEF), // Light green background
                   borderRadius: BorderRadius.circular(12),
@@ -138,7 +134,10 @@ const SizedBox(height: 30),
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
@@ -191,7 +190,7 @@ const SizedBox(height: 30),
               _buildMenuItem(
                 icon: Icons.logout_outlined,
                 title: 'Log Out',
-             onTap: () => _showLogoutDialog(context, ref),
+                onTap: () => _showLogoutDialog(context, ref),
               ),
               const SizedBox(height: 30),
             ],
@@ -244,35 +243,42 @@ const SizedBox(height: 30),
       ),
     );
   }
-void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-
-              await ref.read(authProvider).signOut();
-
-              context.go('/login');
-            },
-            child: const Text(
-              'Yes',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
             ),
-          ),
-        ],
-      );
-    },
-  );
-}
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+
+                await ref.read(authProvider).signOut();
+                ref.read(mockAuthProvider.notifier).state = false;
+
+               context.go(AppRoutes.login);
+              },
+              child: const Text(
+                'Yes',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
